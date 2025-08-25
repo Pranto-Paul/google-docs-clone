@@ -22,13 +22,23 @@ import {
   MessageSquarePlusIcon,
   ListTodoIcon,
   RemoveFormattingIcon,
+  LinkIcon,
+  ImageIcon,
 } from "lucide-react";
 import { useEditorStore } from "@/store/use-editor-store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 interface ToolbarButtonProps {
   onClick?: () => void;
   isActive?: boolean;
   icons: LucideIcon;
 }
+
 const ToolbarButton = ({
   onClick,
   isActive,
@@ -46,8 +56,150 @@ const ToolbarButton = ({
     </button>
   );
 };
+
+const FontFamilyButton = () => {
+  const { editor } = useEditorStore();
+  if (!editor) return null;
+
+  const fonts = [
+    { label: "Arial", value: "Arial" },
+    { label: "Georgia", value: "Georgia" },
+    { label: "Impact", value: "Impact" },
+    { label: "Tahoma", value: "Tahoma" },
+    { label: "Times New Roman", value: "Times New Roman" },
+    { label: "Verdana", value: "Verdana" },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 w-[140px] flex items-center justify-between rounded-sm hover:bg-neutral-200/80 px-1.5 text-sm">
+          <span className="truncate">
+            {editor.getAttributes("textStyle")?.fontFamily || "Arial"}
+          </span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {fonts.map((f) => (
+          <DropdownMenuItem
+            key={f.value}
+            onClick={() => editor.chain().focus().setFontFamily(f.value).run()}
+          >
+            {f.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const FontSizeButton = () => {
+  const { editor } = useEditorStore();
+  if (!editor) return null;
+
+  const sizes = [
+    "12px",
+    "14px",
+    "16px",
+    "18px",
+    "20px",
+    "24px",
+    "28px",
+    "36px",
+    "48px",
+    "72px",
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 w-[100px] flex items-center justify-between rounded-sm hover:bg-neutral-200/80 px-1.5 text-sm">
+          <span className="truncate">
+            {editor.getAttributes("textStyle")?.fontSize || "14px"}
+          </span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {sizes.map((s) => (
+          <DropdownMenuItem
+            key={s}
+            onClick={() =>
+              editor.chain().focus().setMark("textStyle", { fontSize: s }).run()
+            }
+          >
+            {s}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+const ColorButton = () => {
+  const { editor } = useEditorStore();
+  if (!editor) return null;
+
+  return (
+    <input
+      type="color"
+      className="w-7 h-7 rounded cursor-pointer"
+      onChange={(e) => editor.chain().focus().setColor(e.target.value).run()}
+      value={editor.getAttributes("textStyle")?.color || "#000000"}
+    />
+  );
+};
+
+const LinkButton = () => {
+  const { editor } = useEditorStore();
+  if (!editor) return null;
+
+  const setLink = () => {
+    const url = prompt("Enter URL");
+    if (url) {
+      editor.chain().focus().setLink({ href: url }).run();
+    }
+  };
+
+  const unsetLink = () => {
+    editor.chain().focus().unsetLink().run();
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      <ToolbarButton
+        onClick={setLink}
+        isActive={editor.isActive("link")}
+        icons={LinkIcon}
+      />
+      {editor.isActive("link") && (
+        <button
+          onClick={unsetLink}
+          className="text-xs px-2 rounded-sm hover:bg-neutral-200/80"
+        >
+          Remove
+        </button>
+      )}
+    </div>
+  );
+};
+
+const ImageButton = () => {
+  const { editor } = useEditorStore();
+  if (!editor) return null;
+
+  const addImage = () => {
+    const url = prompt("Enter Image URL");
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  };
+
+  return <ToolbarButton onClick={addImage} icons={ImageIcon} />;
+};
+
 const ToolBar = () => {
   const { editor } = useEditorStore();
+
   const sections: {
     label: string;
     icon: LucideIcon;
@@ -171,10 +323,11 @@ const ToolBar = () => {
         label: "Remove Formating",
         icon: RemoveFormattingIcon,
         onClick: () => editor?.chain().focus().unsetAllMarks().run(),
-        isActive: editor?.isActive("taskList") || false,
+        isActive: false,
       },
     ],
   ];
+
   return (
     <div className="bg-[#F1F4F9] px-2.5 py-0.5 rounded-[24px] min-h-[40px] flex items-center gap-x-0.5 overflow-x-auto">
       {sections[0].map((item) => (
@@ -183,33 +336,47 @@ const ToolBar = () => {
           isActive={item.isActive}
           onClick={item.onClick}
           icons={item.icon}
-        ></ToolbarButton>
+        />
       ))}
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      {/* TODO: Font Family */}
+
+      {/* Font Family */}
+      <FontFamilyButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      {/* TODO: Heading */}
+
+      {/* Font Size */}
+      <FontSizeButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
-      {/* TODO: Font Size */}
+
+      {/* Color */}
+      <ColorButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+
       {sections[1].map((item) => (
         <ToolbarButton
           key={item.label}
           isActive={item.isActive}
           onClick={item.onClick}
           icons={item.icon}
-        ></ToolbarButton>
+        />
       ))}
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+
+      {/* Link + Image */}
+      <LinkButton />
+      <ImageButton />
+      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+
       {sections[2].map((item) => (
         <ToolbarButton
           key={item.label}
           isActive={item.isActive}
           onClick={item.onClick}
           icons={item.icon}
-        ></ToolbarButton>
+        />
       ))}
     </div>
   );
 };
+
 export default ToolBar;
