@@ -1,11 +1,43 @@
 "use client";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
+import { Table } from "@tiptap/extension-table";
+import TableRow from "@tiptap/extension-table-row";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import Image from "@tiptap/extension-image";
+import ImageResize from "tiptap-extension-resize-image";
 export const Editor = () => {
   const editor = useEditor({
-    extensions: [StarterKit],
-    content: "<h2>Hello World!</h2><p>This is your first Tiptap editor.</p>",
+    extensions: [
+      StarterKit,
+      TaskItem.configure({ nested: true }),
+      TaskList,
+      Table,
+      TableHeader,
+      TableRow,
+      TableCell,
+      Image.configure({ inline: true, allowBase64: true }),
+      ImageResize,
+    ],
+    content: `
+        <table>
+          <tbody>
+            <tr>
+              <th>Name</th>
+              <th colspan="3">Description</th>
+            </tr>
+            <tr>
+              <td>Cyndi Lauper</td>
+              <td>Singer</td>
+              <td>Songwriter</td>
+              <td>Actress</td>
+            </tr>
+          </tbody>
+        </table>
+      `,
     immediatelyRender: false,
     editorProps: {
       attributes: {
