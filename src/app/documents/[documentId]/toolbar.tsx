@@ -57,6 +57,48 @@ const ToolbarButton = ({
   );
 };
 
+const HeadingButton = () => {
+  const { editor } = useEditorStore();
+  if (!editor) return null;
+
+  const headings = [
+    { label: "H1", level: 1 },
+    { label: "H2", level: 2 },
+    { label: "H3", level: 3 },
+  ];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="h-7 w-[80px] flex items-center justify-between rounded-sm hover:bg-neutral-200/80 px-1.5 text-sm">
+          <span className="truncate">
+            {editor.getAttributes("heading").level
+              ? `H${editor.getAttributes("heading").level}`
+              : "Paragraph"}
+          </span>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {headings.map((h) => (
+          <DropdownMenuItem
+            key={h.level}
+            onClick={() =>
+              editor.chain().focus().toggleHeading({ level: h.level }).run()
+            }
+          >
+            {h.label}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuItem
+          onClick={() => editor.chain().focus().setParagraph().run()}
+        >
+          Paragraph
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 const FontFamilyButton = () => {
   const { editor } = useEditorStore();
   if (!editor) return null;
@@ -365,6 +407,8 @@ const ToolBar = () => {
       {/* Link + Image */}
       <LinkButton />
       <ImageButton />
+      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+      <HeadingButton />
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
 
       {sections[2].map((item) => (
