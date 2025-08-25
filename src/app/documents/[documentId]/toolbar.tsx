@@ -14,12 +14,14 @@ import {
   StrikethroughIcon,
   ListIcon,
   ListOrderedIcon,
-  LinkIcon,
   QuoteIcon,
   AlignLeftIcon,
   AlignCenterIcon,
   AlignRightIcon,
   MinusIcon,
+  MessageSquarePlusIcon,
+  ListTodoIcon,
+  RemoveFormattingIcon,
 } from "lucide-react";
 import { useEditorStore } from "@/store/use-editor-store";
 interface ToolbarButtonProps {
@@ -152,6 +154,26 @@ const ToolBar = () => {
         isActive: editor?.isActive({ textAlign: "right" }) || false,
       },
     ],
+    [
+      {
+        label: "Comment",
+        icon: MessageSquarePlusIcon,
+        onClick: () => alert("Comment feature coming soon!"),
+        isActive: false,
+      },
+      {
+        label: "List Todo",
+        icon: ListTodoIcon,
+        onClick: () => editor?.chain().focus().toggleTaskList().run(),
+        isActive: editor?.isActive("taskList") || false,
+      },
+      {
+        label: "Remove Formating",
+        icon: RemoveFormattingIcon,
+        onClick: () => editor?.chain().focus().unsetAllMarks().run(),
+        isActive: editor?.isActive("taskList") || false,
+      },
+    ],
   ];
   return (
     <div className="bg-[#F1F4F9] px-2.5 py-0.5 rounded-[24px] min-h-[40px] flex items-center gap-x-0.5 overflow-x-auto">
@@ -171,6 +193,15 @@ const ToolBar = () => {
       {/* TODO: Font Size */}
       <Separator orientation="vertical" className="h-6 bg-neutral-300" />
       {sections[1].map((item) => (
+        <ToolbarButton
+          key={item.label}
+          isActive={item.isActive}
+          onClick={item.onClick}
+          icons={item.icon}
+        ></ToolbarButton>
+      ))}
+      <Separator orientation="vertical" className="h-6 bg-neutral-300" />
+      {sections[2].map((item) => (
         <ToolbarButton
           key={item.label}
           isActive={item.isActive}
