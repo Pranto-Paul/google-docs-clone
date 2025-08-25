@@ -9,6 +9,8 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import Image from "@tiptap/extension-image";
 import ImageResize from "tiptap-extension-resize-image";
+import Blockquote from "@tiptap/extension-blockquote";
+import TextAlign from "@tiptap/extension-text-align";
 
 import { useEditorStore } from "@/store/use-editor-store";
 export const Editor = () => {
@@ -49,6 +51,10 @@ export const Editor = () => {
       TableCell,
       Image.configure({ inline: true, allowBase64: true }),
       ImageResize,
+      TextAlign.configure({
+        types: ["heading", "paragraph"], // allows alignment on these nodes
+      }),
+      Blockquote,
     ],
     content: `
         <table>
